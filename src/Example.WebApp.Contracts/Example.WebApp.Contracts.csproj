@@ -4,8 +4,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Example.WebApp.Contracts\Example.WebApp.Contracts.csproj" />
-  </ItemGroup>
-
 </Project>

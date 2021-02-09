@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.PaymentProcessorWorker", "Example.PaymentProcessorWorker\Example.PaymentProcessorWorker.csproj", "{3CE317C5-CA2D-482B-A600-EA57CFA996E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentProcessorWorker", "Example.PaymentProcessorWorker\Example.PaymentProcessorWorker.csproj", "{3CE317C5-CA2D-482B-A600-EA57CFA996E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.PaymentSaga", "Example.PaymentSaga\Example.PaymentSaga.csproj", "{EC20D946-D74B-4B57-8400-D9B7A22587BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentSaga", "Example.PaymentSaga\Example.PaymentSaga.csproj", "{EC20D946-D74B-4B57-8400-D9B7A22587BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.WebApp", "Example.WebApp\Example.WebApp.csproj", "{4B8215C4-9D79-4B32-B0F9-8D4C0198A4FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.WebApp", "Example.WebApp\Example.WebApp.csproj", "{4B8215C4-9D79-4B32-B0F9-8D4C0198A4FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.PaymentSaga.Contracts", "Example.PaymentSaga.Contracts\Example.PaymentSaga.Contracts.csproj", "{C5ED3D31-EB37-4A7E-8034-B847B2F7CED5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentSaga.Contracts", "Example.PaymentSaga.Contracts\Example.PaymentSaga.Contracts.csproj", "{C5ED3D31-EB37-4A7E-8034-B847B2F7CED5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.PaymentProcessor.Contracts", "Example.PaymentProcessor.Contracts\Example.PaymentProcessor.Contracts.csproj", "{4D53B16A-15AF-4876-8D7A-E113280934CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.PaymentProcessor.Contracts", "Example.PaymentProcessor.Contracts\Example.PaymentProcessor.Contracts.csproj", "{4D53B16A-15AF-4876-8D7A-E113280934CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.WebApp.Contracts", "Example.WebApp.Contracts\Example.WebApp.Contracts.csproj", "{447105EC-B3E2-407E-80C5-420CF1ABF7E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{4D53B16A-15AF-4876-8D7A-E113280934CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D53B16A-15AF-4876-8D7A-E113280934CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D53B16A-15AF-4876-8D7A-E113280934CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{447105EC-B3E2-407E-80C5-420CF1ABF7E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{447105EC-B3E2-407E-80C5-420CF1ABF7E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{447105EC-B3E2-407E-80C5-420CF1ABF7E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{447105EC-B3E2-407E-80C5-420CF1ABF7E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

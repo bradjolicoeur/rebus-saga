@@ -36,10 +36,8 @@ namespace Example.WebApp
                 .Options(o =>
                 {
                     o.EnableSynchronousRequestReply();
-                    o.SetNumberOfWorkers(1);
-                    o.SetMaxParallelism(1);
                 })
-                .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "example.webapp"))
+                .Transport(t => t.UseRabbitMq("amqp://rabbitmq:rabbitmq@localhost", "example.webapp"))
                 .Routing(r => r.TypeBased().MapAssemblyOf<ProcessPayment>("example.paymentsaga")));
         }
 
@@ -53,7 +51,7 @@ namespace Example.WebApp
 
             app.ApplicationServices.UseRebus();
             //or optionally act on the bus
-            //app.ApplicationServices.UseRebus(async bus => await bus.Subscribe<Message1>());
+            //app.ApplicationServices.UseRebus(async bus => await bus.Subscribe<ICompletedMakePayment>());
 
             app.UseHttpsRedirection();
 

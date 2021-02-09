@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Example.PaymentSaga.Contracts\Example.PaymentSaga.Contracts.csproj" />
+    <ProjectReference Include="..\Example.WebApp.Contracts\Example.WebApp.Contracts.csproj" />
   </ItemGroup>
 
 
