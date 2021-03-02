@@ -1,6 +1,10 @@
 # Rebus Saga Example
 
-This is an example that uses ReBus, RabbitMQ and 
+This is an example that uses ReBus, RabbitMQ and At the moment uses SQL Server for the persistence.  The solution is a port of my NServiceBusAWS solution that uses Rebus instead of NServiceBus.  The intent is to show a side-by-side implementation of NServiceBus and Rebus to better understand the differences between the two platforms.
+
+There is a `docker-compose.yml` file at the root of the repo that will spin up an instance of RabbitMQ and hopefully in the near future will also spin up the persistance database.
+
+While this example currently works, it is still work in progress and I have a number of things I plan to add to it.
 
 ### Workflow
 
