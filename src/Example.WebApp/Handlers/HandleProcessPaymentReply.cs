@@ -21,7 +21,7 @@ namespace Example.WebApp.Handlers
             //This can address the situation where the immediate response was pending
             _log.LogInformation("Handled ProcessPaymentReply " + message.ReferenceId + " " + message.Status + " webhook post");
 
-            _log.LogInformation("ReplyTo " + MessageContext.Current.Headers[Headers.InReplyTo]);
+            //_log.LogInformation("ReplyTo " + MessageContext.Current.Headers[Headers.InReplyTo]);
 
             return Task.CompletedTask;
         }

@@ -76,7 +76,7 @@ namespace Example.PaymentSaga
         {
             _logger.LogDebug($"Starting Service");
 
-            _serviceProvider.UseRebus(async bus => await bus.Subscribe<ICompletedMakePayment>());    
+            _serviceProvider.UseRebus(async bus => await bus.Subscribe<CompletedMakePayment>());    
 
 
             return Task.CompletedTask;

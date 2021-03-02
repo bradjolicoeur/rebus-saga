@@ -20,7 +20,7 @@ namespace Example.PaymentSaga.Sagas
 {
     class ProcessPaymentSaga : Saga<ProcessPaymentData>,
         IAmInitiatedBy<ProcessPayment>,
-        IHandleMessages<ICompletedMakePayment>,
+        IHandleMessages<CompletedMakePayment>,
         IHandleMessages<ProcessPaymentTimeout>
     {
         private readonly ILogger<ProcessPaymentSaga> _logger;
@@ -51,29 +51,26 @@ namespace Example.PaymentSaga.Sagas
             await _bus.Send(_mapper.Map<MakePayment>(Data));
 
             //Set timeout
-            await _bus.DeferLocal(TimeSpan.FromMilliseconds(10), new ProcessPaymentTimeout { ReferenceId = Data.ReferenceId }, new Dictionary<string, string>
-                    {
-                        //{Headers.ReturnAddress, Data.Originator},
-                        {Headers.CorrelationId,  Data.OriginatorId},
-                        {Headers.InReplyTo, Data.OriginatorId},
-                    });
+            await _bus.DeferLocal(TimeSpan.FromSeconds(3), new ProcessPaymentTimeout { ReferenceId = Data.ReferenceId });
 
             var reply = _mapper.Map<ProcessPaymentReply>(Data);
             reply.Status = "Pending";
             reply.StatusDate = DateTime.UtcNow;
             reply.ConfirmationId = MessageContext.Current.Headers[Headers.MessageId];
 
-            await _bus.Reply(reply);
         }
 
-        public async Task Handle(ICompletedMakePayment message)
+        public async Task Handle(CompletedMakePayment message)
         {
             _logger.LogInformation("Handle ICompletedMakePayment " + message.ReferenceId);
 
             //update saga
             _mapper.Map(message, Data);
 
-            await _bus.Reply(_mapper.Map<ProcessPaymentReply>(Data));
+            await _bus.Advanced.Routing.Send(Data.Originator,_mapper.Map<ProcessPaymentReply>(Data), 
+                    new Dictionary<string, string> { 
+                        { Headers.InReplyTo, Data.OriginatorId}
+                    });
         }
 
 
@@ -90,7 +87,10 @@ namespace Example.PaymentSaga.Sagas
 
                 _logger.LogInformation("correlationid" + Data.Id);
 
-                await _bus.Reply(reply);
+                await _bus.Advanced.Routing.Send(Data.Originator, reply,
+                        new Dictionary<string, string> {
+                             { Headers.InReplyTo, Data.OriginatorId}
+                        });
             }
 
         }
@@ -98,7 +98,7 @@ namespace Example.PaymentSaga.Sagas
         protected override void CorrelateMessages(ICorrelationConfig<ProcessPaymentData> config)
         {
             config.Correlate<ProcessPayment>(m => m.ReferenceId, d => d.ReferenceId);
-            config.Correlate<ICompletedMakePayment>(m => m.ReferenceId, d => d.ReferenceId);
+            config.Correlate<CompletedMakePayment>(m => m.ReferenceId, d => d.ReferenceId);
             config.Correlate<ProcessPaymentTimeout>(m => m.ReferenceId, d => d.ReferenceId);
         }
 

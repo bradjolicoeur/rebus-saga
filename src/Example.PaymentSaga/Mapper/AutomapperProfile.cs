@@ -17,7 +17,7 @@ namespace Example.PaymentSaga.Mapper
             CreateMap<ProcessPayment, MakePayment>();
             CreateMap<ProcessPayment, ProcessPaymentData>()
                 .ForMember(dest => dest.ReferenceId, act => act.Ignore()); //Saga will take care of this
-            CreateMap<ICompletedMakePayment, ProcessPaymentData>()
+            CreateMap<CompletedMakePayment, ProcessPaymentData>()
                 .ForMember(dest => dest.ReferenceId, act => act.Ignore()); //Saga will take care of this
 
             CreateMap<ProcessPaymentData, MakePayment>();
