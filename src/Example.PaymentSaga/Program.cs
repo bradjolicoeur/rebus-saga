@@ -16,6 +16,7 @@ using Example.PaymentSaga.Mapper;
 using Example.PaymentSaga.Messages;
 using Example.WebApp.Contracts.Messages;
 using Example.PaymentProcessor.Contracts.Events;
+using Rebus.Persistence.InMem;
 
 namespace Example.PaymentSaga
 {
@@ -39,8 +40,10 @@ namespace Example.PaymentSaga
                     services.AddRebus(configure => configure
                         .Logging(l => l.ColoredConsole())
                         .Transport(t => t.UseRabbitMq("amqp://rabbitmq:rabbitmq@localhost", "example.paymentsaga"))
-                        .Sagas(s => s.StoreInSqlServer(sagaDbConnectionString, "Sagas", "SagaIndex"))
-                        .Timeouts(to => to.StoreInSqlServer(sagaDbConnectionString,"Timeouts"))
+                        //.Sagas(s => s.StoreInSqlServer(sagaDbConnectionString, "Sagas", "SagaIndex"))
+                        .Sagas(s => s.StoreInMemory())
+                        //.Timeouts(to => to.StoreInSqlServer(sagaDbConnectionString,"Timeouts"))
+                        .Timeouts(to => to.StoreInMemory())
                         .Routing(r => r.TypeBased()
                             .MapAssemblyOf<MakePayment>("example.paymentprocessor")
                             .MapAssemblyOf<ProcessPaymentTimeout>("example.paymentsaga")
