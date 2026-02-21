@@ -1,33 +1,37 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Example.PaymentSaga.Contracts.Commands;
+using Example.WebApp.Handlers;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Rebus.Config;
+using Rebus.Routing.TypeBased;
+using Rebus.ServiceProvider;
 
-namespace Example.WebApp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+// Register handlers
+builder.Services.AutoRegisterHandlersFromAssemblyOf<HandleProcessPaymentReply>();
+
+// Configure and register Rebus
+builder.Services.AddRebus((configure, sp) => configure
+    .Options(o => o.EnableSynchronousRequestReply())
+    .Logging(l => l.MicrosoftExtensionsLogging(sp.GetRequiredService<ILoggerFactory>()))
+    .Transport(t => t.UseRabbitMq("amqp://rabbitmq:rabbitmq@localhost", "example.webapp"))
+    .Routing(r => r.TypeBased().MapAssemblyOf<ProcessPayment>("example.paymentsaga")));
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureLogging( (hostingContext,logging) =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                    logging.AddDebug();
-                    logging.AddConsole();
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+    app.UseDeveloperExceptionPage();
 }
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+
+await app.RunAsync();

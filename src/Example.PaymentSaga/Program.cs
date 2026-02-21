@@ -1,96 +1,38 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Threading.Tasks;
-using Rebus.Bus;
+using Microsoft.Extensions.Logging;
 using Rebus.Config;
+using Rebus.Persistence.InMem;
 using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
-using Rebus.Transport.InMem;
-using Example.PaymentSaga.Contracts.Commands;
-using Microsoft.Extensions.Logging;
-using System.Threading;
 using Example.PaymentProcessor.Contracts.Commands;
-using AutoMapper;
+using Example.PaymentProcessor.Contracts.Events;
 using Example.PaymentSaga.Mapper;
 using Example.PaymentSaga.Messages;
 using Example.WebApp.Contracts.Messages;
-using Example.PaymentProcessor.Contracts.Events;
-using Rebus.Persistence.InMem;
 
-namespace Example.PaymentSaga
-{
-    internal sealed class Program
+await Host.CreateDefaultBuilder(args)
+    .ConfigureServices((hostContext, services) =>
     {
-        private static async Task Main(string[] args)
-        {
-            var sagaDbConnectionString = "Data Source=.;Initial Catalog=rebus-saga;Integrated Security=True";
+        services.AddAutoMapper(cfg => cfg.AddProfile<AutomapperProfile>());
 
-            await Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddAutoMapper(typeof(AutomapperProfile));
+        // Automatically register all handlers from the assembly of a given type
+        services.AutoRegisterHandlersFromAssemblyOf<Program>();
 
-                    services.AddHostedService<ConsoleHostedService>();
-
-                    // Automatically register all handlers from the assembly of a given type...
-                    services.AutoRegisterHandlersFromAssemblyOf<Program>();
-
-                    //Configure Rebus
-                    services.AddRebus(configure => configure
-                        .Logging(l => l.ColoredConsole())
-                        .Transport(t => t.UseRabbitMq("amqp://rabbitmq:rabbitmq@localhost", "example.paymentsaga"))
-                        //.Sagas(s => s.StoreInSqlServer(sagaDbConnectionString, "Sagas", "SagaIndex"))
-                        .Sagas(s => s.StoreInMemory())
-                        //.Timeouts(to => to.StoreInSqlServer(sagaDbConnectionString,"Timeouts"))
-                        .Timeouts(to => to.StoreInMemory())
-                        .Routing(r => r.TypeBased()
-                            .MapAssemblyOf<MakePayment>("example.paymentprocessor")
-                            .MapAssemblyOf<ProcessPaymentTimeout>("example.paymentsaga")
-                            .MapAssemblyOf<ProcessPaymentReply>("example.webapp"))
-
-                        );
-
-                   
-                })
-                .RunConsoleAsync();
-        }
-    }
-
-
-    internal sealed class ConsoleHostedService : IHostedService
-    {
-        private readonly ILogger _logger;
-        private readonly IBus _bus;
-        private readonly IServiceProvider _serviceProvider;
-
-
-        public ConsoleHostedService(
-            ILogger<ConsoleHostedService> logger,
-            IServiceProvider serviceProvider,
-            IBus bus)
-        {
-            _logger = logger;
-            _bus = bus;
-            _serviceProvider = serviceProvider;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogDebug($"Starting Service");
-
-            _serviceProvider.UseRebus(async bus => await bus.Subscribe<CompletedMakePayment>());    
-
-
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-
-            return Task.CompletedTask;
-        }
-
-       
-    }
-}
+        // Configure Rebus
+        services.AddRebus(
+            (configure, sp) => configure
+                .Logging(l => l.MicrosoftExtensionsLogging(sp.GetRequiredService<ILoggerFactory>()))
+                .Transport(t => t.UseRabbitMq("amqp://rabbitmq:rabbitmq@localhost", "example.paymentsaga"))
+                //.Sagas(s => s.StoreInSqlServer(sagaDbConnectionString, "Sagas", "SagaIndex"))
+                .Sagas(s => s.StoreInMemory())
+                //.Timeouts(to => to.StoreInSqlServer(sagaDbConnectionString, "Timeouts"))
+                .Timeouts(to => to.StoreInMemory())
+                .Routing(r => r.TypeBased()
+                    .MapAssemblyOf<MakePayment>("example.paymentprocessor")
+                    .MapAssemblyOf<ProcessPaymentTimeout>("example.paymentsaga")
+                    .MapAssemblyOf<ProcessPaymentReply>("example.webapp")),
+            onCreated: async bus => await bus.Subscribe<CompletedMakePayment>());
+    })
+    .RunConsoleAsync();
